@@ -52,4 +52,9 @@ public class Constants {
         public static String FILTER = "Bộ lọc";
         public static String LOGIN = "Đăng nhập";
     }
+
+    public static final class TYPE_FUNCTION {
+        public static String FUNCTION = "FUNCTION";
+        public static String MODULE = "MODULE";
+    }
 }

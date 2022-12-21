@@ -7,9 +7,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+
 @Getter
 @Setter
-public class PartnerDTO {
+public class DepartmentDTO {
     @NotBlank(message = "Mã không được để trống")
     @Size(min = 3, max = 20, message = "Mã phải có độ dài từ 3 -> 20")
     private String code;
@@ -18,7 +19,8 @@ public class PartnerDTO {
     private String name;
 
     private String description;
+    private String parentCode;
 
-    @NotNull(message = "Số lượng quyền không được để trống")
-    private Integer sizeRole;
+    @NotNull(message = "Partner không được để trống")
+    private String partnerCode;
 }

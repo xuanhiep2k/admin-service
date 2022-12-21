@@ -1,6 +1,7 @@
 package com.example.adminservice.service.impl;
 
 import com.example.adminservice.config.ErrorCode;
+import com.example.adminservice.dto.SearchUserDTO;
 import com.example.adminservice.dto.UserDTO;
 import com.example.adminservice.dto.request.UserRequestDTO;
 import com.example.adminservice.exception.ServerException;
@@ -11,7 +12,13 @@ import com.example.adminservice.service.DepartmentService;
 import com.example.adminservice.service.UserService;
 import com.example.adminservice.utils.Constants;
 import com.example.adminservice.utils.DataUtil;
+import com.example.adminservice.utils.specifications.SpecificationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +40,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final DepartmentService departmentService;
     private final PasswordEncoder passwordEncoder;
     private final ActionLogService actionLogService;
+    private SpecificationFilter specificationFilter;
 
     @Override
     public UserDTO findByUsernameIgnoreCaseAndStatus(String username) {
@@ -83,6 +91,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     MessageFormat.format("Tài khoản {0} đang khóa. Vui lòng mở lại để sử dụng", userDTO.getUsername()));
         }
         return userDTO;
+    }
+
+    @Override
+    public Page<User> findAll(CustomUserDetails customUserDetails, SearchUserDTO searchUserDTO) {
+        Sort sort = Sort.by(searchUserDTO.getSortDirection(), searchUserDTO.getSortBy());
+        Pageable pageable = PageRequest.of(searchUserDTO.getPageNumber(), searchUserDTO.getPageSize(), sort);
+        Specification<User> specification = specificationFilter.specificationUser(searchUserDTO);
+
+        actionLogService.createLog(customUserDetails, Constants.ACTION.SEARCH, Constants.TITLE_LOG.USER,
+                MessageFormat.format("Đã tìm kiếm Users", searchUserDTO.toString()));
+        return userRepository.findAll(specification, pageable);
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(List<String> roles) {

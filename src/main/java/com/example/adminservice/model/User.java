@@ -29,6 +29,8 @@ public class User extends BaseModel implements Serializable {
     private String password;
     @Column(name = "department_code")
     private String departmentCode;
+    @Column(name = "partner_code")
+    private String partnerCode;
     @Type(type = "list-array")
     @Column(name = "roles", columnDefinition = "text[]")
     private List<String> roles;

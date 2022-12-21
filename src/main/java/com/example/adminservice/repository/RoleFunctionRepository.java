@@ -14,4 +14,7 @@ public interface RoleFunctionRepository extends JpaRepository<RoleFunction, Long
             "and r.status = ?2 and f.status = ?2 " +
             "and path = ?1", nativeQuery = true)
     List<String> getRoleByPath(String path, String status);
+
+    List<RoleFunction> findAllByRoleCode(String roleCode);
+
 }
