@@ -34,7 +34,7 @@ public class PartnerController {
     public ResponseEntity<ResponseObject> updatePartner(@CurrentUser CustomUserDetails customUserDetails,
                                                         @Valid @RequestBody PartnerDTO partnerDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ResponseObject("Đã cập nhật partner thành công!", Constants.RESPONSE_CODE.CREATED,
+                new ResponseObject("Đã cập nhật partner thành công!", Constants.RESPONSE_CODE.OK,
                         partnerService.updatePartner(customUserDetails, partnerDTO))
         );
     }
@@ -48,7 +48,7 @@ public class PartnerController {
         );
     }
 
-    @PostMapping("/lockPartner/{code}")
+    @PostMapping("/lock/{code}")
     public ResponseEntity<ResponseObject> lockPartner(@CurrentUser CustomUserDetails customUserDetails,
                                                       @PathVariable String code) {
         partnerService.lockPartner(customUserDetails, code);
@@ -57,15 +57,16 @@ public class PartnerController {
         );
     }
 
-    @PostMapping("/unlockPartner/{code}")
+    @PostMapping("/unlock/{code}")
     public ResponseEntity<ResponseObject> unlockPartner(@CurrentUser CustomUserDetails customUserDetails,
-                                                      @PathVariable String code) {
+                                                        @PathVariable String code) {
         partnerService.unlockPartner(customUserDetails, code);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("Khoá partner thành công!", Constants.RESPONSE_CODE.OK, "")
+                new ResponseObject("Mở khoá partner thành công!", Constants.RESPONSE_CODE.OK, "")
         );
     }
-    @PostMapping("/deletePartner/{code}")
+
+    @PostMapping("/delete/{code}")
     public ResponseEntity<ResponseObject> deletePartner(@CurrentUser CustomUserDetails customUserDetails,
                                                         @PathVariable String code) {
         partnerService.deletePartner(customUserDetails, code);

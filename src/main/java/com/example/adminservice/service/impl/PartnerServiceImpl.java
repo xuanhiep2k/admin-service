@@ -54,7 +54,12 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public Page<Partner> findAll(CustomUserDetails customUserDetails, SearchPartnerDTO searchPartnerDTO) {
         Sort sort = Sort.by(searchPartnerDTO.getSortDirection(), searchPartnerDTO.getSortBy());
-        Pageable pageable = PageRequest.of(searchPartnerDTO.getPageNumber(), searchPartnerDTO.getPageSize(), sort);
+        Pageable pageable;
+        if (searchPartnerDTO.getPageSize() == 0) {
+            pageable = PageRequest.of(searchPartnerDTO.getPageNumber(), Integer.MAX_VALUE, sort);
+        } else {
+            pageable = PageRequest.of(searchPartnerDTO.getPageNumber(), searchPartnerDTO.getPageSize(), sort);
+        }
         Specification<Partner> specification = SpecificationFilter.specificationPartner(searchPartnerDTO);
 
         actionLogService.createLog(customUserDetails, Constants.ACTION.SEARCH, Constants.TITLE_LOG.PARTNER,
@@ -90,7 +95,7 @@ public class PartnerServiceImpl implements PartnerService {
         } else {
             partner.setStatus(Constants.STATUS.LOCKED);
             partnerRepository.save(partner);
-            actionLogService.createLog(customUserDetails, Constants.ACTION.UPDATE, Constants.TITLE_LOG.PARTNER,
+            actionLogService.createLog(customUserDetails, Constants.ACTION.LOCK, Constants.TITLE_LOG.PARTNER,
                     MessageFormat.format("Đã khoá đối tác {0} thành công", code));
         }
     }
@@ -105,7 +110,7 @@ public class PartnerServiceImpl implements PartnerService {
         } else {
             partner.setStatus(Constants.STATUS.ACTIVE);
             partnerRepository.save(partner);
-            actionLogService.createLog(customUserDetails, Constants.ACTION.UPDATE, Constants.TITLE_LOG.PARTNER,
+            actionLogService.createLog(customUserDetails, Constants.ACTION.UNLOCK, Constants.TITLE_LOG.PARTNER,
                     MessageFormat.format("Mở khoá đối tác {0} thành công", code));
         }
     }

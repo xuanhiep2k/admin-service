@@ -4,6 +4,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Constants {
+    public static final class CACHE {
+        public static final String FUNCTION_OF_ROLE = "role.functions";
+        public static final String MENU_OF_ROLE = "role.menu";
+        public static final String ORGANIZATION = "organization";
+        public static final String USER_DETAIL = "user.detail";
+        public static final String AGGREGATION = "aggregation";
+        public static final String FILTER_CONFIG = "filter.config";
+        public static final String APDOMAIN = "apdomain";
+        public static final String APDOMAIN_MAP = "apdomain_map";
+    }
+
     public static class SECURITY {
         public static final String SECRET = "jkbdsfhgu834y438y";
         public static final long EXPIRATION_DAY = 1;
@@ -49,6 +60,7 @@ public class Constants {
         public static String DEPARTMENT = "Phòng/ban";
         public static String PARTNER = "Đối tác";
         public static String FUNCTION = "Chức năng";
+        public static String APP = "Ứng dụng";
         public static String FILTER = "Bộ lọc";
         public static String LOGIN = "Đăng nhập";
     }
