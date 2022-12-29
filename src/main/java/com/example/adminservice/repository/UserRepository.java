@@ -10,5 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     User findByUsernameIgnoreCaseAndStatus(String username, String status);
 
+    User findByUsername(String username);
+
     Page<User> findAll(Specification<User> specification, Pageable pageable);
 }

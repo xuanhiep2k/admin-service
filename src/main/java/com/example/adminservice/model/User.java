@@ -27,6 +27,7 @@ public class User extends BaseModel implements Serializable {
     private String phone;
     private String username;
     private String password;
+    private String avatar;
     @Column(name = "department_code")
     private String departmentCode;
     @Column(name = "partner_code")

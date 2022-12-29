@@ -20,7 +20,6 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.web.cors.CorsConfiguration;
 
 import javax.servlet.Filter;
-import java.util.Collection;
 import java.util.Collections;
 
 @Configuration

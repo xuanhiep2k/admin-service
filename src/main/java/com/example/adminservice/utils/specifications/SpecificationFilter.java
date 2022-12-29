@@ -99,6 +99,7 @@ public class SpecificationFilter {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
     public static Specification<Role> specificationRole(SearchRoleDTO searchRoleDTO) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -113,6 +114,33 @@ public class SpecificationFilter {
 
             if (searchRoleDTO.getStatus() != null && !searchRoleDTO.getStatus().isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("status"), "%" + searchRoleDTO.getStatus() + "%"));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<Department> specificationDepartment(SearchDepartmentDTO searchDepartmentDTO) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            query.distinct(true);
+            if (searchDepartmentDTO.getCode() != null && !searchDepartmentDTO.getCode().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("code"), "%" + searchDepartmentDTO.getCode() + "%"));
+            }
+
+            if (searchDepartmentDTO.getName() != null && !searchDepartmentDTO.getName().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + searchDepartmentDTO.getName() + "%"));
+            }
+
+            if (searchDepartmentDTO.getStatus() != null && !searchDepartmentDTO.getStatus().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("status"), "%" + searchDepartmentDTO.getStatus() + "%"));
+            }
+
+            if (searchDepartmentDTO.getPartnerCode() != null && !searchDepartmentDTO.getPartnerCode().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("partnerCode"), "%" + searchDepartmentDTO.getPartnerCode() + "%"));
+            }
+
+            if (searchDepartmentDTO.getParentCode() != null && !searchDepartmentDTO.getParentCode().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("parentCode]"), "%" + searchDepartmentDTO.getParentCode() + "%"));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

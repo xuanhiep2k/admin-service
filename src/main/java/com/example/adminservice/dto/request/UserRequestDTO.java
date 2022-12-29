@@ -2,6 +2,7 @@ package com.example.adminservice.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -17,8 +18,6 @@ public class UserRequestDTO {
     @Size(min = 3, max = 50, message = "Tên đăng nhập phải có độ dài từ 3 -> 50")
     private String username;
 
-    @NotNull(message = "Mật khẩu không được để trống")
-    @Size(min = 7, max = 20, message = "Mật khẩu phải có độ dài từ 7 -> 20")
     private String password;
 
     @NotNull(message = "Email không được để trống")
@@ -27,6 +26,7 @@ public class UserRequestDTO {
     private String email;
 
     private String phone;
+    private String avatar;
 
     @NotEmpty(message = "Quyền không được để trống")
     private List<String> roles;
@@ -37,6 +37,9 @@ public class UserRequestDTO {
     @Size(min = 3, max = 100, message = "Tên phải có độ dài từ 3 -> 100 ")
     private String fullName;
 
+    @NotEmpty(message = "Department không được để trống")
     private String departmentCode;
+
+    @NotEmpty(message = "Partner không được để trống")
     private String partnerCode;
 }

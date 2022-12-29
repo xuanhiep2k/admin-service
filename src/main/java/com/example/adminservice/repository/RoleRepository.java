@@ -14,6 +14,8 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Role findByCode(String code);
 
+    List<Role> findAllByPartnerCodeAndStatus(String partnerCode, String status);
+
     List<Role> findAll(Specification<Role> specification);
 
     Page<Role> findAll(Specification<Role> specification, Pageable pageable);
