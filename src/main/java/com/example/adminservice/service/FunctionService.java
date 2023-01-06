@@ -5,7 +5,10 @@ import com.example.adminservice.dto.SearchFunctionDTO;
 import com.example.adminservice.dto.TreeNodeDTO;
 import com.example.adminservice.model.CustomUserDetails;
 import com.example.adminservice.model.Function;
+import com.example.adminservice.model.Role;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface FunctionService {
     FunctionDTO createFunction(CustomUserDetails customUserDetails, FunctionDTO functionDTO);
@@ -22,4 +25,6 @@ public interface FunctionService {
     void unlockFunction(CustomUserDetails customUserDetails, String code);
 
     void deleteFunction(CustomUserDetails customUserDetails, String code);
+
+    List<Function> getFunctionByRoleCode(CustomUserDetails customUserDetails, String[] roles);
 }

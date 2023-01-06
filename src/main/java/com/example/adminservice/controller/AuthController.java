@@ -42,9 +42,12 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
         principal.eraseCredentials();
-
+        String app = loginRequestDTO.getApp();
+        if(DataUtil.isNullOrEmpty(app)){
+            app = Constants.APP.DEFAULT;
+        }
         UserDTO userDTO =
-                userService.findByUsernameIgnoreCaseAndStatus(principal.getUsername());
+                userService.findByUsernameIgnoreCaseAndStatus(principal.getUsername(),app);
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ResponseObject("Tài khoản không tồn tại hoặc bị khóa", Constants.RESPONSE_CODE.BAD_REQUEST, null));

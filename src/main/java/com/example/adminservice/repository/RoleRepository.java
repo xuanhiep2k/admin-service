@@ -1,5 +1,6 @@
 package com.example.adminservice.repository;
 
+import com.example.adminservice.model.Function;
 import com.example.adminservice.model.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

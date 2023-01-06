@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.text.MessageFormat;
@@ -231,6 +232,20 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.delete(role);
             actionLogService.createLog(customUserDetails, Constants.ACTION.DELETE, Constants.TITLE_LOG.ROLE,
                     MessageFormat.format("Xoá quyền {0} thành công", code));
+        }
+    }
+
+    @Override
+    public List<Function> listFunctionByUser(List<String> role, String appCode, String type) {
+        if (!StringUtils.isEmpty(appCode)) {
+            if (role.contains(Constants.ROLE.ADMIN)) {
+                return functionRepository.findAllByStatusAndAppCodeAndType(
+                        Constants.STATUS.ACTIVE, appCode, type);
+            } else {
+                return functionRepository.getFunctionActiveByUser(role, Constants.STATUS.ACTIVE, appCode);
+            }
+        } else {
+            return new ArrayList<>();
         }
     }
 }

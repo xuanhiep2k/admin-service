@@ -25,6 +25,7 @@ public class UserDTO {
     private String status;
     private String avatar;
     private String accessToken;
+    private MenuDTO menu;
     private Date createdDate;
     private Date updatedDate;
     private String createdBy;

@@ -11,11 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface UserService {
-    UserDTO findByUsernameIgnoreCaseAndStatus(String username);
 
     UserDTO updateUser(CustomUserDetails customUserDetails, UserRequestDTO userRequestDTO, MultipartFile multipartFile) throws IOException;
 
     Page<User> findAll(CustomUserDetails customUserDetails, SearchUserDTO searchUserDTO);
+
+    UserDTO findByUsernameIgnoreCaseAndStatus(String username, String appCode);
+
+    UserDTO findByUsernameIgnoreCaseAndStatus(String username);
 
     UserDTO findByUsername(String username);
 

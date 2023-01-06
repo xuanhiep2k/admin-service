@@ -1,6 +1,7 @@
 package com.example.adminservice.service.impl;
 
 import com.example.adminservice.config.ErrorCode;
+import com.example.adminservice.dto.MenuDTO;
 import com.example.adminservice.dto.SearchUserDTO;
 import com.example.adminservice.dto.UserDTO;
 import com.example.adminservice.dto.request.UserRequestDTO;
@@ -10,6 +11,7 @@ import com.example.adminservice.repository.RoleRepository;
 import com.example.adminservice.repository.UserRepository;
 import com.example.adminservice.service.ActionLogService;
 import com.example.adminservice.service.DepartmentService;
+import com.example.adminservice.service.RoleService;
 import com.example.adminservice.service.UserService;
 import com.example.adminservice.utils.Constants;
 import com.example.adminservice.utils.DataUtil;
@@ -17,6 +19,7 @@ import com.example.adminservice.utils.specifications.SpecificationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +48,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final DepartmentService departmentService;
+    private final RoleService roleService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActionLogService actionLogService;
@@ -52,10 +56,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private String UPLOADED_FOLDER;
 
     @Override
+    public UserDTO findByUsernameIgnoreCaseAndStatus(String username, String appCode) {
+        User user = userRepository.findByUsernameIgnoreCaseAndStatus(username, Constants.STATUS.ACTIVE);
+        if (user != null) {
+            UserDTO userDTO = new UserDTO(user);
+            userDTO.setMenu(getMenu(userDTO.getRoles(), appCode,
+                    appCode + "|" + String.join("|", userDTO.getRoles())));
+            userDTO.setAuthorities(getGrantedAuthorities(userDTO.getRoles()));
+            return userDTO;
+        }
+        return null;
+    }
+
+    @Override
     public UserDTO findByUsernameIgnoreCaseAndStatus(String username) {
         User user = userRepository.findByUsernameIgnoreCaseAndStatus(username, Constants.STATUS.ACTIVE);
         if (user != null) {
             UserDTO userDTO = new UserDTO(user);
+
             userDTO.setAuthorities(getGrantedAuthorities(userDTO.getRoles()));
             return userDTO;
         }
@@ -91,7 +109,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO createUser(CustomUserDetails customUserDetails, UserRequestDTO userRequestDTO, MultipartFile multipartFile) throws IOException {
         if (userRequestDTO.getRoles().contains(Constants.ROLE.ADMIN)) {
-            throw new ServerException(ErrorCode.FORBIDDEN, "Bạn không thể tạo username ADMIN");
+            throw new ServerException(ErrorCode.FORBIDDEN, "Bạn không thể tạo người dùng có quyền ADMIN");
         }
         if (DataUtil.isNullOrEmpty(userRequestDTO.getPartnerCode())) {
             userRequestDTO.setPartnerCode(customUserDetails.getPartnerCode());
@@ -106,6 +124,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             }
 
             userDTO = new UserDTO(userRequestDTO);
+            userDTO.setAvatar(null);
             // Upload avatar
             if (!Objects.isNull(multipartFile)) {
                 long yourMilliSeconds = System.currentTimeMillis();
@@ -142,6 +161,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO updateUser(CustomUserDetails customUserDetails, UserRequestDTO userRequestDTO, MultipartFile multipartFile) throws IOException {
         UserDTO userDTO = findByUsername(userRequestDTO.getUsername());
+        if (userRequestDTO.getRoles().contains(Constants.ROLE.ADMIN) && !userDTO.getRoles().contains(Constants.ROLE.ADMIN)) {
+            throw new ServerException(ErrorCode.FORBIDDEN, "Bạn không thể tạo người dùng có quyền ADMIN");
+        }
         if (userDTO == null) {
             throw new ServerException(ErrorCode.NOT_FOUND,
                     MessageFormat.format("Tài khoản {0} không tồn tại trong hệ thống", userRequestDTO.getUsername()));
@@ -210,11 +232,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             if (userDTO == null) {
                 throw new UsernameNotFoundException("Tài khoản không tồn tại hoặc bị khóa");
             } else {
+                System.out.println(new CustomUserDetails(userDTO));
                 return new CustomUserDetails(userDTO);
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw new UsernameNotFoundException("Username not found exception");
+        }
+    }
+
+    @Cacheable(value = Constants.CACHE.MENU_OF_ROLE, key = "#cacheKey")
+    public MenuDTO getMenu(List<String> role, String appCode, String cacheKey) {
+        MenuDTO menuDTO = new MenuDTO("Menu", null, null, null, null);
+        List<Function> list =
+                roleService.listFunctionByUser(role, appCode, Constants.FUNCTION_TYPE.FUNCTION.name());
+        List<Function> listParent =
+                list.stream().filter(f -> f.getParentCode() == null
+                        && f.getType().equals(Constants.FUNCTION_TYPE.FUNCTION.name())).collect(Collectors.toList());
+        if (listParent.size() > 0) {
+            for (Function f : listParent) {
+                MenuDTO child = new MenuDTO(f.getName(), f.getPath(), f.getId(), f.getCode(), f.getIcon());
+                menuDTO.addChild(child);
+                list.remove(f);
+                buildMenu(child, list);
+            }
+        }
+        return menuDTO;
+    }
+
+    private void buildMenu(MenuDTO menuDTO, List<Function> listF) {
+        if (listF.size() > 0) {
+            List<Function> listChild =
+                    listF.stream().filter(f -> Objects.equals(menuDTO.getCode(), f.getCode())
+                            && f.getType().equals(Constants.FUNCTION_TYPE.FUNCTION.name())).collect(Collectors.toList());
+            if (listChild.size() > 0) {
+                for (Function f : listChild) {
+                    MenuDTO child = new MenuDTO(f.getName(), f.getPath(), f.getId(), f.getCode(), f.getIcon());
+                    menuDTO.addChild(child);
+                    listF.remove(f);
+                    buildMenu(child, listF);
+                }
+            }
         }
     }
 }

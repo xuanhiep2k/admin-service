@@ -5,14 +5,17 @@ import com.example.adminservice.dto.FunctionDTO;
 import com.example.adminservice.dto.SearchFunctionDTO;
 import com.example.adminservice.model.CustomUserDetails;
 import com.example.adminservice.model.ResponseObject;
+import com.example.adminservice.model.Role;
 import com.example.adminservice.service.FunctionService;
 import com.example.adminservice.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/function")
@@ -44,6 +47,16 @@ public class FunctionController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("Tìm kiếm function thành công!", Constants.RESPONSE_CODE.OK,
                         functionService.findAll(customUserDetails, searchFunctionDTO))
+        );
+    }
+
+    @RequestMapping(value = "/getFunctionByRoleCode", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseObject> getFunctionByRoleCode(@CurrentUser CustomUserDetails customUserDetails,
+                                                                @RequestParam(name = "roles") String[] roles) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("Tìm kiếm function thành công!", Constants.RESPONSE_CODE.OK,
+                        functionService.getFunctionByRoleCode(customUserDetails, roles))
         );
     }
 

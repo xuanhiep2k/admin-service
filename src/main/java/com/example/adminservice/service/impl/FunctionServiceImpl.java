@@ -7,6 +7,7 @@ import com.example.adminservice.dto.TreeNodeDTO;
 import com.example.adminservice.exception.ServerException;
 import com.example.adminservice.model.CustomUserDetails;
 import com.example.adminservice.model.Function;
+import com.example.adminservice.model.Role;
 import com.example.adminservice.repository.FunctionRepository;
 import com.example.adminservice.service.ActionLogService;
 import com.example.adminservice.service.FunctionService;
@@ -196,5 +197,17 @@ public class FunctionServiceImpl implements FunctionService {
         } else {
             throw new ServerException(ErrorCode.BAD_REQUEST, "Chức năng phải ở trạng thái khóa để thực hiện xóa");
         }
+    }
+
+    @Override
+    public List<Function> getFunctionByRoleCode(CustomUserDetails customUserDetails, String[] roles) {
+        List<Function> functions = new ArrayList<>();
+        for (String role : roles) {
+            List<Function> functionList = functionRepository.getFunctionActiveByRole(role, Constants.STATUS.ACTIVE);
+            for (Function function : functionList) {
+                functions.add(function);
+            }
+        }
+        return functions;
     }
 }

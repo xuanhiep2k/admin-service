@@ -27,6 +27,11 @@ public class Constants {
         public static final String LOCKED = "LOCKED";
     }
 
+    public enum FUNCTION_TYPE {
+        FUNCTION,
+        MODULE
+    }
+
     public static final class ROLE {
         public static final String ADMIN = "ADMIN";
     }
@@ -68,5 +73,9 @@ public class Constants {
     public static final class TYPE_FUNCTION {
         public static String FUNCTION = "FUNCTION";
         public static String MODULE = "MODULE";
+    }
+
+    public static final class APP {
+        public static final String DEFAULT = "admin_service";
     }
 }

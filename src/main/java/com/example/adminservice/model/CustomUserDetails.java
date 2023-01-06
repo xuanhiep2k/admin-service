@@ -29,8 +29,8 @@ public class CustomUserDetails extends User {
                              String fullName,
                              String email,
                              String departmentCode,
-                             String partnerCode,
-                             String departmentPath) {
+                             String departmentPath,
+                             String partnerCode) {
         super(username, password, authorities);
         this.id = id;
         this.fullName = fullName;

@@ -17,4 +17,5 @@ public class LoginRequestDTO {
     @Size(min = 1, max = 20, message = "Mật khẩu phải có độ từ dài từ 1 -> 20 kí tự")
     private String password;
 
+    private String app;
 }

@@ -1,9 +1,11 @@
 package com.example.adminservice.controller;
 
+import com.example.adminservice.config.ErrorCode;
 import com.example.adminservice.config.security.CurrentUser;
 import com.example.adminservice.dto.SearchUserDTO;
 import com.example.adminservice.dto.UserDTO;
 import com.example.adminservice.dto.request.UserRequestDTO;
+import com.example.adminservice.exception.ServerException;
 import com.example.adminservice.model.CustomUserDetails;
 import com.example.adminservice.model.ResponseObject;
 import com.example.adminservice.model.User;
@@ -18,13 +20,20 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -41,6 +50,21 @@ public class UserController {
                         Constants.RESPONSE_CODE.OK,
                         userService.getCurrentUserInfo(customUserDetails))
         );
+    }
+
+    @RequestMapping("/checkPermission")
+    public ResponseEntity<Object> checkPermission(Authentication authentication, Object o, Collection<ConfigAttribute> collection) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        List<String> needRoles = collection.stream().map(ConfigAttribute::getAttribute).collect(Collectors.toList());
+        for (GrantedAuthority grantedAuthority : authorities) {
+            if (needRoles.contains(grantedAuthority.getAuthority())
+                    || grantedAuthority.getAuthority().equals(Constants.ROLE.ADMIN)) {
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("", Constants.RESPONSE_CODE.OK, ""));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("", Constants.RESPONSE_CODE.FORBIDDEN, ""));
     }
 
     @PostMapping("/create")
